@@ -4,3 +4,6 @@ __pycache__/
 .DS_Store
 .vscode
 venv/
+node_modules/
+.pytest_cache/
+.serverless/
