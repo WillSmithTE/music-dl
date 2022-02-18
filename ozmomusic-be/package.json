@@ -1,0 +1,28 @@
+{
+  "name": "ozmomusic-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WillSmithTE/ozmomusic-be.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WillSmithTE/ozmomusic-be/issues"
+  },
+  "homepage": "https://github.com/WillSmithTE/ozmomusic-be#readme",
+  "devDependencies": {
+    "serverless-python-requirements": "^5.2.2",
+    "serverless-version-tracker": "^1.0.1",
+    "serverless-wsgi": "^3.0.0"
+  }
+}

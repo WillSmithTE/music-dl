@@ -1,0 +1,44 @@
+{
+	"expo": {
+		"name": "OZMO Tunes",
+		"description": "Music player",
+		"slug": "ozmo-tunes",
+		"owner": "willsmithte",
+		"version": "1.0.0",
+		"githubUrl": "https://github.com/willsmithte/ozmomusic",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"androidStatusBar": {
+			"barStyle": "light-content"
+		},
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "cover",
+			"backgroundColor": "#ffffff"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "willsmithte.ozmotunes",
+			"config": {
+				"googleMobileAdsAppId": "ca-app-pub-3940256099942544~1458002511"
+			}
+		},
+		"android": {
+			"package": "willsmithte.ozmotunes",
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#FFFFFF"
+			},
+			"config": {
+				"googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
+			}
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		}
+	}
+}

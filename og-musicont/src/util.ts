@@ -1,0 +1,1 @@
+export const toString = (input: any): string => JSON.stringify(input, null, 2)
