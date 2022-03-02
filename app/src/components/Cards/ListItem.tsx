@@ -1,11 +1,9 @@
-import React, { useEffect, useState, memo } from 'react';
+import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux'
 import Icon from '../Icon';
 import millisToMin from '../../helpers/millisToMin';
 import { DownloadButton } from './DownloadButton';
 import { DeleteDownloadButton } from './DeleteDownloadButton';
-import { RootState } from '../../store/reduxStore';
 
 const ListItem = ({
 	id = '',

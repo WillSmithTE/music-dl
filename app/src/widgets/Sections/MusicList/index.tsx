@@ -10,7 +10,7 @@ import { toString } from '../../../util';
 import { RootState } from '../../../store/reduxStore';
 import { Song } from '../../../types';
 
-const Index = ({ style = {}, indicator = true, useIndex = false }) => {
+const Index = ({ style = {}, indicator = true, useIndex = false, sound }) => {
 	const { navigate } = useNavigation();
 	const [favs, setFavs] = useState([]);
 	const [playlistModal, setPlaylistModal] = useState(false);

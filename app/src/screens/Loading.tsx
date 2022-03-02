@@ -9,13 +9,14 @@ import { Ads } from '../components';
 import { songStorage } from '../helpers/songStorage';
 import { RootState } from '../store/reduxStore';
 import { newSongs, playerSlice, setCurrentSong } from '../store/slices/playerSlice';
+import { SoundProp } from '../../App'
 
 const { width, height } = Dimensions.get('screen');
 
-const Loading = ({ navigation: { replace } }) => {
+const Loading = ({ navigation: { replace }, sound }: { sound: SoundProp, navigation: any }) => {
 
 	const songs = useSelector((state: RootState) => state.player.songs)
-    const dispatch = useDispatch()
+	const dispatch = useDispatch()
 
 	const [assets] = useAssets([require('../../assets/splash.png')]);
 
@@ -26,10 +27,10 @@ const Loading = ({ navigation: { replace } }) => {
 			const playlists = await Storage.get('playlists', true);
 
 			if (recents && recents.length > 0) {
-				dispatch(setCurrentSong({details: songs[recents[0]]}))
+				sound.set({ detail: songs[recents[0]] })
 			}
 
-			const savedSongs  = await songStorage.getSongs()
+			const savedSongs = await songStorage.getSongs()
 			dispatch(newSongs(savedSongs))
 
 			resolve();

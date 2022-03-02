@@ -9,8 +9,9 @@ import { Card, Icon } from '../../components';
 import { api } from '../../api';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { Song } from '../../types';
+import { SoundProp } from '../../../App';
 
-const Index = ({  }) => {
+const Index = ({ sound }: {sound: SoundProp}) => {
 	const { goBack } = useNavigation();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [song, setSong] = useState<Song | undefined>(undefined)

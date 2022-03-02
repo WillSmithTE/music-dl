@@ -13,14 +13,14 @@ import { millisToMin, Storage } from '../../helpers';
 import { RootState } from '../../store/reduxStore';
 import { setCurrentSong } from '../../store/slices/playerSlice';
 import { AVPlaybackStatus } from 'expo-av';
+import { PlaybackSong, SoundProp } from '../../../App';
 
-const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
+const Index = ({ route: { params }, navigation: { goBack }, sound }: PlayingProps) => {
 
 	const songs = useSelector((state: RootState) => state.player.songs)
-	const song = useSelector((state: RootState) => state.player.currentSong)
 	const dispatch = useDispatch()
 
-	const stopBtnAnim = useRef(new Animated.Value(song?.soundObj?.isLoaded && song?.soundObj?.isPlaying ? 1 : 0.3)).current;
+	const stopBtnAnim = useRef(new Animated.Value(sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying ? 1 : 0.3)).current;
 	const [isFav, setIsFav] = useState(false);
 	const [actions, setActions] = useState({
 		prev: false,
@@ -32,7 +32,7 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	const verifyFav = async () => {
 		const favs = await Storage.get('favourites', true);
 		if (favs !== null) {
-			const currentIndex = songs.findIndex((i) => i.id === song?.detail?.id);
+			const currentIndex = songs.findIndex((i) => i.id === sound.get?.detail?.id);
 			if (favs.includes(currentIndex)) {
 				setIsFav(true);
 			} else {
@@ -67,7 +67,7 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	};
 
 	const onPlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
-		dispatch(setCurrentSong(playbackStatus))
+		sound.set({ playbackStatus })
 
 		if (playbackStatus?.isLoaded && playbackStatus?.didJustFinish) {
 			handleNext();
@@ -75,20 +75,17 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	};
 
 	const configAndPlay = (shouldPlay = false) => {
-		if (!song?.soundObj?.isLoaded) {
+		if (!sound.get?.soundObj?.isLoaded) {
 			return Audio.configAndPlay(
-				song?.detail?.uri,
+				sound.get?.detail?.uri,
 				shouldPlay
-			)((playback, soundObj) => {
-				console.error('----------------------')
-				console.error(JSON.stringify(decycle(playback), null, 2))
-				dispatch(setCurrentSong({
-					playback: decycle(playback),
-					soundObj,
-				},
-				))
+			)((playback, status) => {
+				sound.set({
+					playback: playback,
+					soundObj: status,
+				})
 
-				addToRecentlyPlayed(songs.findIndex((i) => i.id === song?.detail?.id));
+				addToRecentlyPlayed(songs.findIndex((i) => i.id === sound.get?.detail?.id));
 			})(onPlaybackStatusUpdate);
 		}
 	};
@@ -96,27 +93,26 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	const handlePlayAndPause = async () => {
 		_e({ play: true });
 
-		if (!song?.soundObj?.isLoaded) {
+		if (!sound.get?.soundObj?.isLoaded) {
 			configAndPlay(true);
 			_e({ play: true });
 		}
 
-		if (song?.soundObj?.isLoaded && song?.soundObj?.isPlaying) {
-			return Audio.pause(song?.playback)((soundObj) => {
-				dispatch(setCurrentSong({
+		if (sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying) {
+			return Audio.pause(sound.get?.playback)((soundObj) => {
+				sound.set({
 					soundObj,
-				},
-				))
+				})
 
 				_e({ play: false });
 			});
 		}
 
-		if (song?.soundObj?.isLoaded && !song?.soundObj?.isPlaying) {
-			return Audio.resume(song?.playback!!)((soundObj) => {
-				dispatch(setCurrentSong({
+		if (sound.get?.soundObj?.isLoaded && !sound.get?.soundObj?.isPlaying) {
+			return Audio.resume(sound.get?.playback!!)((soundObj) => {
+				sound.set({
 					soundObj,
-				}))
+				})
 
 				_e({ play: false });
 			});
@@ -126,12 +122,12 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	const handleStop = async (after = () => { }) => {
 		_e({ stop: true });
 
-		if (song?.soundObj?.isLoaded) {
-			return Audio.stop(song?.playback)(() => {
-				dispatch(setCurrentSong({
+		if (sound.get?.soundObj?.isLoaded) {
+			return Audio.stop(sound.get?.playback)(() => {
+				sound.set({
 					soundObj: {},
 				},
-				))
+				)
 
 				after();
 				_e({ stop: false });
@@ -145,19 +141,19 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	const handlePrev = async () => {
 		_e({ prev: true });
 
-		const currentIndex = songs.findIndex((i) => i.id === song?.detail?.id);
+		const currentIndex = songs.findIndex((i) => i.id === sound.get?.detail?.id);
 		const prevIndex = currentIndex === 0 ? songs.length - 1 : currentIndex - 1;
 		const prevSong = songs[prevIndex];
 
 		return handleStop(() => {
 			Audio.play(
-				song?.playback,
+				sound.get?.playback,
 				prevSong?.uri!!
 			)((soundObj) => {
-				dispatch(setCurrentSong({
+				sound.set({
 					soundObj,
 					detail: prevSong,
-				}))
+				})
 
 				addToRecentlyPlayed(prevIndex);
 				_e({ prev: false });
@@ -168,19 +164,19 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	async function handleNext() {
 		_e({ next: true });
 
-		const currentIndex = songs.findIndex((i) => i.id === song?.detail?.id);
+		const currentIndex = songs.findIndex((i) => i.id === sound.get?.detail?.id);
 		const nextIndex = currentIndex === songs.length - 1 ? 0 : currentIndex + 1;
 		const nextSong = songs[nextIndex];
 
 		return handleStop(() => {
 			Audio.play(
-				song?.playback,
+				sound.get?.playback,
 				nextSong?.uri!!
 			)((soundObj) => {
-				dispatch(setCurrentSong({
+				sound.set({
 					soundObj,
 					detail: nextSong,
-				}))
+				})
 
 				addToRecentlyPlayed(nextIndex);
 				_e({ next: false });
@@ -190,17 +186,17 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 
 	const handleSeek = (millis: number) => {
 		return Audio.seek(
-			song?.playback,
+			sound.get?.playback,
 			Math.floor(millis)
 		)((soundObj) => {
-			dispatch(setCurrentSong({
+			sound.set({
 				soundObj,
-			}))
+			})
 		})(onPlaybackStatusUpdate);
 	};
 
 	useEffect(() => {
-		if (song?.soundObj?.isLoaded && song?.soundObj?.isPlaying) {
+		if (sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying) {
 			Animated.timing(stopBtnAnim, {
 				toValue: 1,
 				duration: 1000,
@@ -213,7 +209,7 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 				useNativeDriver: true,
 			}).start();
 		}
-	}, [song]);
+	}, [sound]);
 
 	useEffect(() => {
 		(async () => {
@@ -224,19 +220,19 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 
 	useEffect(() => {
 		verifyFav();
-	}, [song?.detail?.id]);
+	}, [sound.get?.detail?.id]);
 
 	useEffect(() => {
-		if (params?.forcePlay && params?.song?.uri !== song?.detail?.uri) {
+		if (params?.forcePlay && params?.song?.uri !== sound.get?.detail?.uri) {
 			handleStop(() => {
 				Audio.play(
-					song?.playback,
+					sound.get?.playback,
 					params?.song?.uri
 				)((soundObj) => {
-					dispatch(setCurrentSong({
+					sound.set({
 						soundObj,
 						detail: params?.song,
-					}))
+					})
 
 					addToRecentlyPlayed(params?.index);
 				})(onPlaybackStatusUpdate);
@@ -247,7 +243,7 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 	return (
 		<>
 			<StatusBar style="light" />
-			<ImageBackground style={styles.container} source={{ uri: song?.detail?.image }} blurRadius={10} resizeMode="cover">
+			<ImageBackground style={styles.container} source={{ uri: sound.get?.detail?.image }} blurRadius={10} resizeMode="cover">
 				<View style={[StyleSheet.absoluteFill, styles.overlay]} />
 				<Header
 					options={{
@@ -262,27 +258,27 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 				/>
 				<View style={styles.frame}>
 					<View>
-						<Image style={styles.clipart} source={{ uri: song?.detail?.image }} resizeMode="cover" borderRadius={20} />
+						<Image style={styles.clipart} source={{ uri: sound.get?.detail?.image }} resizeMode="cover" borderRadius={20} />
 					</View>
 					<View style={styles.details}>
 						<View style={{ marginBottom: 25 }}>
-							<Text style={styles.songTitle}>{song?.detail?.title}</Text>
-							<Text style={styles.artistName}>{song?.detail?.author}</Text>
+							<Text style={styles.songTitle}>{sound.get?.detail?.title}</Text>
+							<Text style={styles.artistName}>{sound.get?.detail?.author}</Text>
 						</View>
 						<View style={styles.tracker}>
 							<Slider
 								minimumValue={0}
-								maximumValue={song?.detail?.durationMillis}
+								maximumValue={sound.get?.detail?.durationMillis}
 								minimumTrackTintColor="#C07037"
 								thumbTintColor="transparent"
 								maximumTrackTintColor="transparent"
-								value={song?.playbackStatus?.isLoaded && song?.playbackStatus?.positionMillis || 0}
+								value={sound.get?.playbackStatus?.isLoaded && sound.get?.playbackStatus?.positionMillis || 0}
 								onSlidingComplete={handleSeek}
 							/>
 						</View>
 						<View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-							<Text style={styles.minMin}>{millisToMin(song?.playbackStatus?.isLoaded && song?.playbackStatus?.positionMillis || 0)}</Text>
-							<Text style={styles.maxMin}>{millisToMin(song?.detail?.durationMillis)}</Text>
+							<Text style={styles.minMin}>{millisToMin(sound.get?.playbackStatus?.isLoaded && sound.get?.playbackStatus?.positionMillis || 0)}</Text>
+							<Text style={styles.maxMin}>{millisToMin(sound.get?.detail?.durationMillis)}</Text>
 						</View>
 					</View>
 					<View style={styles.actionsContainer}>
@@ -290,8 +286,8 @@ const Index = ({ route: { params }, navigation: { goBack } }: PlayingProps) => {
 							<Icon name="skip-back" color="#C4C4C4" />
 						</TouchableOpacity>
 						<TouchableOpacity onPress={handlePlayAndPause}>
-							<LinearGradient style={[styles.playAndPauseBtn, (!song?.soundObj?.isLoaded || !song?.soundObj?.isPlaying) && { paddingLeft: 4 }]} colors={['#939393', '#000']}>
-								<Icon name={song?.soundObj?.isLoaded && song?.soundObj?.isPlaying ? `pause` : `play`} color="orange" />
+							<LinearGradient style={[styles.playAndPauseBtn, (!sound.get?.soundObj?.isLoaded || !sound.get?.soundObj?.isPlaying) && { paddingLeft: 4 }]} colors={['#939393', '#000']}>
+								<Icon name={sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying ? `pause` : `play`} color="orange" />
 							</LinearGradient>
 						</TouchableOpacity>
 						<TouchableOpacity onPress={handleNext}>
@@ -367,22 +363,6 @@ const styles = StyleSheet.create({
 	},
 });
 
-interface PlayingProps  {
-
-}
-
-function decycle(obj, stack = []) {
-    if (!obj || typeof obj !== 'object')
-        return obj;
-    
-    if (stack.includes(obj))
-        return null;
-
-    let s = stack.concat([obj]);
-
-    return Array.isArray(obj)
-        ? obj.map(x => decycle(x, s))
-        : Object.fromEntries(
-            Object.entries(obj)
-                .map(([k, v]) => [k, decycle(v, s)]));
+interface PlayingProps {
+	sound: SoundProp
 }

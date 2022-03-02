@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Dimensions, Image, StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { Dimensions, Image, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { SoundProp } from '../../../App';
 
 import Songs from '../Songs/SongsList';
 
-const Home = () => {
+const Home = ({sound}: {sound: SoundProp}) => {
 	return (
 		<>
 			<TouchableWithoutFeedback >
-				<Songs />
+				<Songs sound={sound} />
 			</TouchableWithoutFeedback>
 		</>
 	);

@@ -6,13 +6,13 @@ import { useAssets } from 'expo-asset';
 import { Section } from '../../widgets';
 import { Icon } from '../../components';
 
-const Index = ({  }) => {
+const Index = ({ sound }) => {
 	const [assets] = useAssets([require('../../assets/icons/hamburger.png'), require('../../assets/icons/search.png')]);
 	const [drawer, setDrawer] = useState(false);
 
 	return (<>
 		<View style={styles.sections}>
-			<Section.MusicList indicator={false} />
+			<Section.MusicList indicator={false} sound={sound} />
 		</View>
 	</>
 	);

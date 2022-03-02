@@ -34,6 +34,7 @@ export const play = (playbackObject: Audio.Sound, uri: string, shouldPlay = true
 				try {
 					console.debug(`About to play (uri=${uri})`)
 					const soundObj = await playbackObject?.loadAsync({ uri }, { shouldPlay });
+					console.debug(`soundObj=${JSON.stringify(soundObj, null, 2)}`)
 					playbackStatusUpdate(playbackObject)(onPlaybackStatusUpdate);
 					next(soundObj);
 				} catch (error: any) {

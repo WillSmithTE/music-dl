@@ -11,17 +11,17 @@ import { Storage } from '../../helpers';
 import { RootState } from '../../store/reduxStore';
 import { setCurrentSong } from '../../store/slices/playerSlice';
 import { AVPlaybackStatus } from 'expo-av';
+import { SoundProp } from '../../../App';
 
 const { width } = Dimensions.get('screen');
 
-const Index = ({ }) => {
+const Index = ({sound }: {sound: SoundProp}) => {
 
 	const songs = useSelector((state: RootState) => state.player.songs)
-	const song = useSelector((state: RootState) => state.player.currentSong)
 	const dispatch = useDispatch()
 
 	const { navigate } = useNavigation();
-	const stopBtnAnim = useRef(new Animated.Value(song?.soundObj?.isLoaded && song?.soundObj?.isPlaying ? 1 : 0.3)).current;
+	const stopBtnAnim = useRef(new Animated.Value(sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying ? 1 : 0.3)).current;
 	const [actions, setActions] = useState({
 		prev: false,
 		play: false,
@@ -55,9 +55,9 @@ const Index = ({ }) => {
 	};
 
 	const onPlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
-		dispatch(setCurrentSong({
+		sound.set({
 			playbackStatus,
-		}))
+		})
 
 		if (playbackStatus?.isLoaded && playbackStatus?.didJustFinish) {
 			handleNext();
@@ -65,17 +65,17 @@ const Index = ({ }) => {
 	};
 
 	const configAndPlay = (shouldPlay = false) => {
-		if (!song?.soundObj?.isLoaded) {
+		if (!sound.get?.soundObj?.isLoaded) {
 			return Audio.configAndPlay(
-				song?.detail?.uri,
+				sound.get?.detail?.uri,
 				shouldPlay
 			)((playback, soundObj) => {
-				dispatch(setCurrentSong({
+				sound.set({
 					playback,
 					soundObj,
-				}));
+				});
 
-				addToRecentlyPlayed(songs.findIndex((i) => i.id === song?.detail?.id));
+				addToRecentlyPlayed(songs.findIndex((i) => i.id === sound.get?.detail?.id));
 			})(onPlaybackStatusUpdate);
 		}
 	};
@@ -83,26 +83,26 @@ const Index = ({ }) => {
 	const handlePlayAndPause = async () => {
 		_e({ play: true });
 
-		if (!song?.soundObj?.isLoaded) {
+		if (!sound.get?.soundObj?.isLoaded) {
 			configAndPlay(true);
 			_e({ play: true });
 		}
 
-		if (song?.soundObj?.isLoaded && song?.soundObj?.isPlaying) {
-			return Audio.pause(song?.playback)((soundObj) => {
-				dispatch(setCurrentSong({
+		if (sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying) {
+			return Audio.pause(sound.get?.playback)((soundObj) => {
+				sound.set({
 					soundObj,
-				}));
+				});
 
 				_e({ play: false });
 			});
 		}
 
-		if (song?.soundObj?.isLoaded && !song?.soundObj?.isPlaying) {
-			return Audio.resume(song?.playback)((soundObj) => {
-				dispatch(setCurrentSong({
+		if (sound.get?.soundObj?.isLoaded && !sound.get?.soundObj?.isPlaying) {
+			return Audio.resume(sound?.get.playback)((soundObj) => {
+				sound.set({
 					soundObj,
-				}));
+				});
 
 				_e({ play: false });
 			});
@@ -112,11 +112,11 @@ const Index = ({ }) => {
 	const handleStop = async (after = () => { }) => {
 		_e({ stop: true });
 
-		if (song?.soundObj?.isLoaded) {
-			return Audio.stop(song?.playback)(() => {
-				dispatch(setCurrentSong({
+		if (sound.get?.soundObj?.isLoaded) {
+			return Audio.stop(sound.get?.playback)(() => {
+				sound.set({
 					soundObj: {},
-				}));
+				});
 
 				after();
 				_e({ stop: false });
@@ -130,19 +130,19 @@ const Index = ({ }) => {
 	const handlePrev = async () => {
 		_e({ prev: true });
 
-		const currentIndex = songs.findIndex((i) => i.id === song?.detail?.id);
+		const currentIndex = songs.findIndex((i) => i.id === sound.get?.detail?.id);
 		const prevIndex = currentIndex === 0 ? songs.length - 1 : currentIndex - 1;
 		const prevSong = songs[prevIndex];
 
 		return handleStop(() => {
 			Audio.play(
-				song?.playback,
+				sound.get?.playback,
 				prevSong?.uri!!
 			)((soundObj) => {
-				dispatch(setCurrentSong({
+				sound.set({
 					soundObj,
 					detail: prevSong,
-				}));
+				});
 
 				addToRecentlyPlayed(prevIndex);
 				_e({ prev: false });
@@ -153,19 +153,19 @@ const Index = ({ }) => {
 	async function handleNext() {
 		_e({ next: true });
 
-		const currentIndex = songs.findIndex((i) => i.id === song?.detail?.id);
+		const currentIndex = songs.findIndex((i) => i.id === sound.get?.detail?.id);
 		const nextIndex = currentIndex === songs.length - 1 ? 0 : currentIndex + 1;
 		const nextSong = songs[nextIndex];
 
 		return handleStop(() => {
 			Audio.play(
-				song?.playback,
+				sound.get?.playback,
 				nextSong?.uri!!
 			)((soundObj) => {
-				dispatch(setCurrentSong({
+				sound.set({
 					soundObj,
 					detail: nextSong,
-				}));
+				});
 
 				addToRecentlyPlayed(nextIndex);
 				_e({ next: false });
@@ -174,7 +174,7 @@ const Index = ({ }) => {
 	}
 
 	useEffect(() => {
-		if (song?.soundObj?.isLoaded && song?.soundObj?.isPlaying) {
+		if (sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying) {
 			Animated.timing(stopBtnAnim, {
 				toValue: 1,
 				duration: 1000,
@@ -187,7 +187,7 @@ const Index = ({ }) => {
 				useNativeDriver: true,
 			}).start();
 		}
-	}, [song]);
+	}, [sound]);
 
 	useEffect(() => {
 		(async () => {
@@ -207,11 +207,11 @@ const Index = ({ }) => {
 				/>
 				<Slider
 					minimumValue={0}
-					maximumValue={song?.detail?.durationMillis}
+					maximumValue={sound.get?.detail?.durationMillis}
 					minimumTrackTintColor="#C07037"
 					thumbTintColor="transparent"
 					maximumTrackTintColor="transparent"
-					value={song?.playbackStatus?.isLoaded && song?.playbackStatus?.positionMillis || 0}
+					value={sound.get?.playbackStatus?.isLoaded && sound.get?.playbackStatus?.positionMillis || 0}
 				/>
 			</View>
 			<View style={styles.left}>
@@ -226,21 +226,21 @@ const Index = ({ }) => {
 								opacity: 0.5,
 								alignSelf: 'center',
 							}}
-							source={{ uri: song?.detail?.image }}
+							source={{ uri: sound.get?.detail?.image }}
 							resizeMode="cover"
 							borderRadius={150}
 							blurRadius={100}
 						/>
-						<Image style={styles.coverArt} source={{ uri: song?.detail?.image }} resizeMode="cover" borderRadius={150} />
+						<Image style={styles.coverArt} source={{ uri: sound.get?.detail?.image }} resizeMode="cover" borderRadius={150} />
 					</View>
 				</TouchableWithoutFeedback>
 			</View>
 			<View style={styles.content}>
 				<Text style={styles.songTitle} numberOfLines={1}>
-					{song?.detail?.title}
+					{sound.get?.detail?.title}
 				</Text>
 				<Text style={styles.songArtist} numberOfLines={1}>
-					{song?.detail?.author}
+					{sound.get?.detail?.author}
 				</Text>
 			</View>
 			<View style={styles.actions}>
@@ -248,9 +248,9 @@ const Index = ({ }) => {
 					<Icon name="skip-back" color="#C4C4C4" />
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.btn} onPress={handlePlayAndPause} disabled={actions?.play}>
-					<Icon name={song?.soundObj?.isLoaded && song?.soundObj?.isPlaying ? `pause` : `play`} color={song?.soundObj?.isLoaded && song?.soundObj?.isPlaying ? `#C07037` : `#C4C4C4`} />
+					<Icon name={sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying ? `pause` : `play`} color={sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying ? `#C07037` : `#C4C4C4`} />
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.btn} onPress={() => (song?.soundObj?.isLoaded && song?.soundObj?.isPlaying ? handleStop(() => { }) : () => { })} disabled={actions?.stop}>
+				<TouchableOpacity style={styles.btn} onPress={() => (sound.get?.soundObj?.isLoaded && sound.get?.soundObj?.isPlaying ? handleStop(() => { }) : () => { })} disabled={actions?.stop}>
 					<Animated.View style={{ opacity: stopBtnAnim }}>
 						<Icon family="Ionicons" name="stop-outline" color="#C4C4C4" />
 					</Animated.View>

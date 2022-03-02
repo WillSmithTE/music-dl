@@ -4,16 +4,19 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TabBarIcon from "../components/TabBarIcon";
 
-import { Loading, Search, Playing, Home  } from './screens';
+import { Loading, Search, Playing, Home } from './screens';
 import { SCREENS } from '../constants';
 import { BLACK, DARK_GRAY, PRIMARY_COLOR, WHITE } from '../assets/styles';
+import { SoundProp } from '../../App';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const StackNavigation = () => (
+const StackNavigation = ({ sound }: { sound: SoundProp }) => (
 	<Stack.Navigator headerMode="none" initialRouteName={SCREENS.LOADING}>
-		<Stack.Screen name={SCREENS.LOADING} component={Loading} />
+		<Stack.Screen name={SCREENS.LOADING} >
+			{(props) => <Loading {...props} sound={sound} />}
+		</Stack.Screen>
 		<Stack.Screen name={SCREENS.TAB} options={{ headerShown: false, animationEnabled: false }}>
 			{() => (
 				<Tab.Navigator
@@ -36,7 +39,6 @@ const StackNavigation = () => (
 				>
 					<Tab.Screen
 						name={SCREENS.HOME}
-						component={Home}
 						options={{
 							tabBarIcon: ({ focused }) => (
 								<TabBarIcon
@@ -45,10 +47,11 @@ const StackNavigation = () => (
 								/>
 							),
 						}}
-					/>
+					>
+						{(props) => <Home {...props} sound={sound} />}
+					</Tab.Screen>
 					<Tab.Screen
 						name={SCREENS.SEARCH}
-						component={Search}
 						options={{
 							tabBarIcon: ({ focused }) => (
 								<TabBarIcon
@@ -57,11 +60,17 @@ const StackNavigation = () => (
 								/>
 							),
 						}}
-					/>
-					<Tab.Screen name={SCREENS.PLAYING} component={Playing} options={{
-						tabBarButton: () => null,
-						// tabBarVisible: false
-					}} />
+					>
+						{(props) => <Search {...props} sound={sound} />}
+					</Tab.Screen>
+					<Tab.Screen
+						name={SCREENS.PLAYING}
+						options={{
+							tabBarButton: () => null,
+							// tabBarVisible: false
+						}} >
+						{(props) => <Playing {...props} sound={sound} />}
+					</Tab.Screen>
 
 				</Tab.Navigator>
 			)}
@@ -80,10 +89,10 @@ const StackNavigation = () => (
 	</Stack.Navigator>
 );
 
-const Index = () => {
+const Index = ({ sound }: { sound: SoundProp }) => {
 	return (
 		<NavigationContainer>
-			<StackNavigation />
+			<StackNavigation sound={sound} />
 		</NavigationContainer>
 	);
 };
