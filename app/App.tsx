@@ -1,13 +1,13 @@
 import React from 'react';
-import { Provider as RRProvider } from 'react-redux';
+import { Provider } from 'react-redux';
 
-import store from './src/store';
+import { store } from './src/store/reduxStore';
 import Screens from './src/screens';
 
 export default function App() {
 	return (
-		<RRProvider store={store}>
+		<Provider store={store}>
 			<Screens />
-		</RRProvider>
+		</Provider>
 	);
 }

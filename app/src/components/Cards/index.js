@@ -1,6 +1,6 @@
 import Explore from './Explore';
-import MusicList from './MusicList';
+import ListItem from './ListItem';
 import Playlist from './Playlist';
 import Recent from './Recent';
 
-export { Explore, MusicList, Playlist, Recent };
+export { Explore, ListItem, Playlist, Recent };

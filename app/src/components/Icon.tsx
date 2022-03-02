@@ -17,7 +17,7 @@ import {
 } from '@expo/vector-icons';
 
 interface IC {
-	family:
+	family?:
 		| 'AntDesign'
 		| 'Entypo'
 		| 'EvilIcons'
@@ -34,11 +34,11 @@ interface IC {
 		| 'Zocial';
 	[name: string]: any;
 	[size: number]: any;
-	color: string;
-	props: object;
+	color?: string;
+	props?: object;
 }
 
-const Icon = ({ family = 'Feather', name = 'home', size = 24, color = '#000', props }: IC) => (
+const Icon = ({ family = 'Feather', name = 'home', size = 24, color = '#000', props = {} }: IC) => (
 	<>
 		{family === 'AntDesign' && <AntDesign name={name} size={size} color={color} {...props} />}
 		{family === 'Entypo' && <Entypo name={name} size={size} color={color} {...props} />}

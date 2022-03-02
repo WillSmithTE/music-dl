@@ -1,18 +1,13 @@
 import React, { useEffect, useState, memo } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Icon from '../Icon';
-import * as Modal from '../../widgets/Modals';
 import millisToMin from '../../helpers/millisToMin';
-import { api } from '../../api';
-import { useAssets } from 'expo-asset';
-import { DISPATCHES } from '../../constants';
-import * as FileSystem from 'expo-file-system';
 import { DownloadButton } from './DownloadButton';
 import { DeleteDownloadButton } from './DeleteDownloadButton';
+import { RootState } from '../../store/reduxStore';
 
-const MusicList = ({
+const ListItem = ({
 	id = '',
 	style = {},
 	imageURL,
@@ -22,16 +17,12 @@ const MusicList = ({
 	onPlayPress = () => { },
 	moreOptions = [],
 	isSearchPage = false,
-	playable = true,
-	songs,
 	searchTerm,
 	uri,
-}) => {
-	const [moreOptionsModal, setMoreOptionsModal] = useState(false);
-
+}: MusicListProps) => {
 	return (
 		<>
-			<TouchableOpacity style={[styles.container, style]} onLongPress={() => setMoreOptionsModal(true)} activeOpacity={0.8}>
+			<TouchableOpacity style={[styles.container, style]} activeOpacity={0.8}>
 				<View style={styles.left}>
 					<Image
 						style={{
@@ -58,28 +49,25 @@ const MusicList = ({
 					</View>
 					<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 						<Text style={styles.duration}>{millisToMin(duration)}</Text>
-						{!isSearchPage && <DeleteDownloadButton id={id} uri={uri} />}
+						{!isSearchPage && <DeleteDownloadButton id={id} uri={uri!!} />}
 					</View>
 				</View>
-				{playable &&
+				{onPlayPress &&
 					<View style={styles.right}>
 						<TouchableOpacity onPress={onPlayPress}>
 							<Icon family='AntDesign' name="play" color="orange" />
 						</TouchableOpacity>
 					</View>
 				}
-				{isSearchPage && <DownloadButton songs={songs} searchTerm={searchTerm} id={id} title={title} imageURL={imageURL} duration={duration} author={author} />}
+				{isSearchPage && <DownloadButton searchTerm={searchTerm!!} id={id} title={title} imageURL={imageURL} duration={duration} author={author} />}
 
 
 			</TouchableOpacity>
-
-			<Modal.MoreOptions visible={moreOptionsModal} onClose={setMoreOptionsModal} title={title} moreOptions={moreOptions} />
 		</>
 	);
 };
 
-const mapStateToProps = (state) => ({ songs: state?.player?.songs });
-export default connect(mapStateToProps, null)(memo(MusicList));
+export default ListItem;
 
 const styles = StyleSheet.create({
 	container: {
@@ -125,3 +113,17 @@ const styles = StyleSheet.create({
 		borderColor: '#FFF',
 	},
 });
+
+type MusicListProps = {
+	id: string,
+	style?: {},
+	imageURL: string,
+	title: string,
+	author: string,
+	duration: number,
+	onPlayPress?: () => void,
+	moreOptions?: {}[],
+	isSearchPage?: boolean,
+	searchTerm?: string,
+	uri?: string,
+}

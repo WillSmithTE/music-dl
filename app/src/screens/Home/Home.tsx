@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { Dimensions, Image, StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAssets } from 'expo-asset';
-import { StatusBar } from 'expo-status-bar';
 
-import { Footer, Header, Section, Drawer } from '../../widgets';
-import { Icon } from '../../components';
-import Songs from '../Songs';
+import Songs from '../Songs/SongsList';
 
-const Index = () => {
-	const [drawer, setDrawer] = useState(false);
-
+const Home = () => {
 	return (
 		<>
 			<TouchableWithoutFeedback >
@@ -20,7 +13,7 @@ const Index = () => {
 	);
 };
 
-export default Index;
+export default Home;
 
 const styles = StyleSheet.create({
 	container: {

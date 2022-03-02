@@ -5,17 +5,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { connect } from 'react-redux';
 
-import { Section } from '../../widgets';
 import { Card, Icon } from '../../components';
 import { api } from '../../api';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
+import { Song } from '../../types';
 
-const Index = ({ songs }) => {
+const Index = ({  }) => {
 	const { goBack } = useNavigation();
-	const [audios, setAudios] = useState([]);
 	const [searchTerm, setSearchTerm] = useState('');
-	const [song, setSong] = useState(undefined)
-	const [error, setError] = useState(undefined)
+	const [song, setSong] = useState<Song | undefined>(undefined)
+	const [error, setError] = useState<{} | undefined>(undefined)
 	const [loading, setIsLoading] = useState(false)
 
 	const search = () => {
@@ -75,7 +74,7 @@ const Index = ({ songs }) => {
 									<ActivityIndicator style={{ transform: [{ scale: 4 }] }} color='orange' />
 								</View>
 							} else if (song) {
-								return <Card.MusicList id={song.id} imageURL={song.image} title={song.title} author={song.author} duration={song.durationMillis} isSearchPage playable={false} searchTerm={searchTerm} />
+								return <Card.ListItem id={song.id} imageURL={song.image} title={song.title} author={song.author} duration={song.durationMillis} isSearchPage searchTerm={searchTerm} />
 							} else {
 								return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 									<Text style={{ fontSize: 24, fontWeight: 'bold', color: 'rgba(0, 0, 0, .3)' }}>Paste a SoundCloud URL...</Text>
@@ -89,8 +88,7 @@ const Index = ({ songs }) => {
 	);
 };
 
-const mapStateToProps = (state) => ({ songs: state?.player?.songs });
-export default connect(mapStateToProps, null)(memo(Index));
+export default Index;
 
 const styles = StyleSheet.create({
 	container: {

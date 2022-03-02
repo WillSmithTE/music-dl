@@ -1,10 +1,6 @@
 import Loading from './Loading';
-import Search from './Search';
-import Playing from './Playing';
-import Home from './Home';
-import Songs from './Songs';
-import Favourite from './Favourite';
-import Recent from './Recent';
-import Playlists from './Playlists';
+import Search from './Search/Search';
+import Playing from './Playing/Playing';
+import Home from './Home/Home';
 
-export { Loading, Search, Playing, Home, Songs, Favourite, Recent, Playlists };
+export { Loading, Search, Playing, Home, };

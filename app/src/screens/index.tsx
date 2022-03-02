@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TabBarIcon from "../components/TabBarIcon";
 
-import { Loading, Search, Playing, Home, Songs, Favourite, Recent, Playlists,  } from './screens';
+import { Loading, Search, Playing, Home  } from './screens';
 import { SCREENS } from '../constants';
 import { BLACK, DARK_GRAY, PRIMARY_COLOR, WHITE } from '../assets/styles';
 
